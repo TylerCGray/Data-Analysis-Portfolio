@@ -2,7 +2,7 @@
 -- COUNT function used to calculate total orders
 
 SELECT  date,
-		COUNT(order_id) AS total_orders
+	COUNT(order_id) AS total_orders
 FROM orders
 GROUP BY date
 ORDER BY date 
@@ -11,7 +11,7 @@ ORDER BY date
 -- Used DATEPART to extract hour of day
 
 SELECT  DATEPART(hour, time) AS hour_of_day,
-		COUNT(order_id) AS total_orders
+	COUNT(order_id) AS total_orders
 FROM orders
 GROUP BY DATEPART(hour, time)
 ORDER BY total_orders DESC
@@ -21,7 +21,7 @@ ORDER BY total_orders DESC
 
 WITH total_pizzas_per_order AS
 	(SELECT  order_id,
-			 COUNT(pizza_id) AS total_pizzas
+	 COUNT(pizza_id) AS total_pizzas
 	FROM order_details
 	GROUP BY order_id)
 
@@ -33,7 +33,7 @@ FROM total_pizzas_per_order
 -- Multiple INNER JOINS used to join order details and pizzas table. This was needed to obtain pricing information per pizza type
 
 SELECT  DATEPART(Year, date) AS year,
-		ROUND(SUM(price),2) AS total_revenue
+	ROUND(SUM(price),2) AS total_revenue
 FROM orders o
 JOIN order_details d
 ON o.order_id = d.order_id
@@ -46,7 +46,7 @@ GROUP BY DATEPART(Year, date)
 -- Used DATEPART to extract month number. SUM aggregate function used to calculate total revenue
 
 SELECT  DATEPART(Month, date) AS month,
-		ROUND(SUM(price),2) AS total_revenue
+	ROUND(SUM(price),2) AS total_revenue
 FROM orders o
 JOIN order_details d
 ON o.order_id = d.order_id
@@ -61,8 +61,8 @@ ORDER BY total_revenue DESC
 
 WITH ranking AS
 	(SELECT	pizza_id,
-			SUM(quantity) AS total_pizzas_purchased,
-			DENSE_RANK () OVER (order by SUM(quantity) ASC) AS ranking
+	SUM(quantity) AS total_pizzas_purchased,
+	DENSE_RANK () OVER (order by SUM(quantity) ASC) AS ranking
 	FROM order_details
 	GROUP BY pizza_id)
 
@@ -74,8 +74,8 @@ WHERE ranking <=5
 -- Top 5 orders placed ordered by total value
 
 SELECT	TOP 5
-		order_id,
-		ROUND(SUM(price * quantity),2) AS order_value
+	order_id,
+	ROUND(SUM(price * quantity),2) AS order_value
 FROM order_details o
 JOIN pizzas p
 ON o.pizza_id = p.pizza_id
@@ -87,12 +87,12 @@ ORDER BY SUM(price * quantity) DESC
 -- Using a CASE statment to create new column as required
 
 SELECT	size,
-		CASE
-			WHEN size = 'L' THEN 'Large' 
-			WHEN size = 'M' THEN 'Medium'
-			WHEN size = 'S' THEN 'Small'	
-			ELSE NULL
-		END AS size_name
+	   CASE
+		WHEN size = 'L' THEN 'Large' 
+		WHEN size = 'M' THEN 'Medium'
+		WHEN size = 'S' THEN 'Small'	
+		ELSE NULL
+	END AS size_name
 FROM pizzas
 
 
