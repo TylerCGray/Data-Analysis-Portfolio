@@ -1,0 +1,57 @@
+-- Preventative Maintenance Compliance KPI
+-- CTE created to calculate number of passed inspections. Subsequent SELECT statement used to calculate pass %
+
+WITH EquipmentMaintenanceStatus_CTE AS (
+    SELECT
+        COUNT(maintenance_reason_code) AS total_MaintenanceChecks,
+        SUM(CASE
+                WHEN maintenance_result = 'PASS' THEN 1
+                ELSE 0
+            END) AS PassCount
+    FROM
+        VehicleMaintenanceRecords
+    WHERE
+        maintenance_reason_code IN ('CheckTypeA', 'CheckTypeB', 'CheckTypeC', 'CheckTypeD')
+        AND record_created_date BETWEEN '2023-07-01' AND '2023-08-31'
+)
+
+SELECT
+    ROUND((CAST(PassCount AS FLOAT) / total_MaintenanceChecks), 2) AS ComplianceRate
+FROM
+    EquipmentMaintenanceStatus_CTE;
+
+-- Out Of Service Vehicle KPI
+-- CTE used to calculate total active fleet vehicles and total available. SELECT statement used to calculate out of stock %
+
+WITH ActiveFleetOverview_CTE AS (
+    SELECT
+        VehicleIdentifier,
+        MaintenanceState,
+        ArchiveFlag,
+        OperationalStatus,
+        ServiceActive
+    FROM
+        FleetVehicles
+    WHERE
+        LEN(VehicleIdentifier) >= 17
+        AND ServiceActive LIKE 'ACTIVE%'
+),
+
+MaintenanceStatusCounts AS (
+    SELECT
+        SUM(CASE
+                WHEN MaintenanceState = 'INSHOP' THEN 1
+                ELSE 0
+            END) AS OutOfServiceCount,
+        SUM(CASE
+                WHEN MaintenanceState = 'AVAILABLE' THEN 1
+                ELSE 0
+            END) AS AvailableCount
+    FROM
+        FleetOverview_CTE
+)
+
+SELECT
+    (CAST(OutOfServiceCount AS FLOAT) / AvailableCount) AS OutOfServicePercentage
+FROM
+    MaintenanceStatusCounts;
