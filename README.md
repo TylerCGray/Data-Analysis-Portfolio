@@ -13,5 +13,5 @@ Project 1: SQL statements used to analyze customer order data
  
 **On The Job Code Examples**
 
-- Examples of real world SQL queries used on the job to solve various problems.
+- Examples of real world SQL queries used on the job to solve various problems. (Table and columns names have been disguised for privacy reasons)
 
